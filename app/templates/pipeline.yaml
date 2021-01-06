@@ -42,9 +42,6 @@ spec:
           value: $(params.app-name)
         - name: git-revision
           value: $(params.git-revision)
-      # workspaces:
-      # - name: config-repo
-      #   workspace: config-repo
     - name: argocd-sync-deployment
       params:
         - name: app-name
@@ -53,6 +50,8 @@ spec:
           value: {{ .Values.config.argoCD.option | quote }}
         - name: argocd-version
           value: {{ .Values.config.argoCD.version }}
+        - name: revision
+          value: $(params.git-revision)
       runAfter:
         - update-gitops-repo
       taskRef:

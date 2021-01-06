@@ -8,31 +8,35 @@ spec:
       type: string
     - name: git-revision
       type: string
+    - name: env
+      type: string
+      default: prod
   stepTemplate:
     env:
     - name: APP
       value: $(params.app-name)
     - name: VESION
       value: $(git-revision)
+    - name: DEPLOY_ENV
+      value: $(params.env)
   steps:
-    - name: git clone
+    - name: git-clone
       image: docker.io/alpine/git:v2.26.2
       script: |
         git config --global user.email {{ .Values.config.email }}
         git config --global user.name {{ .Values.config.user }}
         git clone https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
-    - name: update-deploy
+        cd {{ .Values.config.repo }}
+        git branch $DEPLOY_ENV
+        git checkout $DEPLOY_ENV
+    - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       command: [yq, w, -i]
       args: [{{ .Values.config.repo }}/app/values.yaml, config.apps(name==$APP).version, $VESION]
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
-        cd $(resources.inputs.app-config.path)
-        git config --global user.email {{ .Values.config.email }}
-        git config --global user.name {{ .Values.config.user }}
-        git checkout master
-        git pull
+        cd {{ .Values.config.repo }}
         git add .
         git commit -m "update $APP"
         git push
