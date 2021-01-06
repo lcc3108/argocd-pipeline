@@ -1,0 +1,16 @@
+config:
+  argoCD:
+    version: v1.7.7
+    url: argocd.lcc3108.ga
+  dockerRepo:
+    url: harbor.lcc3108.ga
+  serviceAccountName: builder-bot
+  apps:
+  - name: node-web-app
+    namespace: node-web-project
+    svn:
+      type: git
+      url: github.com/lcc3108/node-web-app
+    docker:
+      imageName: node-web-app
+    useStaging : true

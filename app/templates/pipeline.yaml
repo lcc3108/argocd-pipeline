@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline
+spec:
+  params:
+    - name: application-name
+      description: >-
+      build appliction name in argocd
+  resources:
+    - name: source
+      type: git
+    - name: image
+      type: image
+  tasks:
+    - name: build-and-publish-image
+      resources:
+        inputs:
+          - name: source
+            resource: source
+        outputs:
+          - name: image
+            resource: image
+      taskRef:
+        kind: Task
+        name: source-to-image
+    - name: argocd-sync-deployment
+      params:
+        - name: application-name
+          value: node-web-app
+        - name: flags
+          value: '--insecure --grpc-web'
+        - name: argocd-version
+          value: v1.7.7
+      runAfter:
+        - build-and-publish-image
+      taskRef:
+        kind: Task
+        name: argocd-task-sync-and-wait

@@ -1,0 +1,82 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: triger-template
+spec:
+  params: 
+  - name: git-repo-url
+  - name: git-repo-name
+  - name: git-revision
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+    spec:
+      params:
+      - name: url
+        value: $(tt.params.git-repo-url)
+      - name: revision
+        value: $(tt.params.git-revision)
+      - name: git-repo-name
+        value: $(tt.params.git-repo-name)
+      type: git
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+    spec:
+      params:
+      - name: url
+        value: {{ .Values.config.dockerRepo.url }}/web-node-app:$(tt.params.git-revision)
+      type: image
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: $(tt.params.git-repo-name)-$(tt.params.git-revision)-run
+    spec:
+      params:
+      - name: image
+        value: '$(params.git-repo-name):$(params.git-revision)' 
+      pipelineRef:
+        name: pipeline
+      resources:
+      - name: app-source
+        resourceRef:
+          name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+      - name: app-image
+        resourceRef:
+          name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+      serviceAccountName: {{ .Values.config.serviceAccountName }}
+
+
+--- 
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: trigger-binding
+spec:
+  params:
+  - name: git-repo-url
+    value: $(body.repository.url)
+  - name: git-revision
+    value: $(body.head_commit.id)
+  - name: git-repo-name
+    value: $(body.repository.name)
+
+---
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: event-listener
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - ref: node-web-app-tb
+    template:
+      ref: node-web-app-tt
+
+---
