@@ -15,7 +15,7 @@ spec:
     spec:
       params:
       - name: url
-        value: {{ .Values.config.url }}
+        value: https://{{ .Values.config.url }}
       - name: revision
         value: init-gitops
       type: git

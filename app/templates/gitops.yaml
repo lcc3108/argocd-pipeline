@@ -19,8 +19,9 @@ spec:
         - yq 
       args:
         - w
+        - -i
         - $(resources.inputs.app-config.path)/app/values.yaml
-        - 'config.apps(name==$(params.application-name)).version'
+        - 'config.apps(.name==$(params.application-name)).version'
         - $(params.git-revision)
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
