@@ -16,8 +16,8 @@ spec:
       params:
       - name: url
         value: https://{{ .Values.config.url }}
-      - name: revision
-        value: init-gitops
+      - name: refspec
+        value: master
       type: git
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource

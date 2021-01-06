@@ -18,6 +18,8 @@ spec:
       value: $(prams.application-name)
     - name: VESION
       value: $(git-revision)
+    - name: BRANCH
+      value: $(resources.inputs.refspec)
   steps:
     - name: update-deploy
       image: mikefarah/yq:3.3.4
@@ -29,8 +31,9 @@ spec:
         cd $(resources.inputs.app-config.path)
         git config --global user.email {{ .Values.config.email }}
         git config --global user.name {{ .Values.config.user }}
+        git checkout $BRANCH
         git add .
-        git commit -m "update $(params.application-name)"
+        git commit -m "update $APP"
         git push
   # workspaces:
   # - name: config-repo

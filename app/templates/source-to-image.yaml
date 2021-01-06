@@ -28,10 +28,10 @@ spec:
       env:
         - name: "DOCKER_CONFIG"
           value: "/tekton/home/.docker/"
-      script: |
-        
-        /kaniko/executor
-        --dockerfile=$(params.pathToDockerFile)
-        --destination=$(resources.outputs.app-image.url)
-        --context=$(params.pathToContext)
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(resources.outputs.app-image.url)
+        - --context=$(params.pathToContext)
 
