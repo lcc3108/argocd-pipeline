@@ -12,11 +12,17 @@ spec:
     inputs:
       - name: app-config
         type: git
+  stepTemplate:
+    env:
+    - name: APP
+      value: $(prams.application-name)
+    - name: VESION
+      value: $(git-revision)
   steps:
     - name: update-deploy
       image: mikefarah/yq:3.3.4
-      command: [yq, w]
-      args: [$(resources.inputs.app-config.path)/app/values.yaml, config.apps(.name==$(params.application-name)).version, $(params.git-revision)]
+      command: [yq, w, -i]
+      args: [$(resources.inputs.app-config.path)/app/values.yaml, config.apps(name==$APP).version, $VESION]
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
