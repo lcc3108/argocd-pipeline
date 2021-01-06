@@ -25,11 +25,11 @@ spec:
     - name: argocd-sync-deployment
       params:
         - name: application-name
-          value: node-web-app
+          value: $(params.application-name)
         - name: flags
-          value: '--insecure --grpc-web'
+          value: {{ .Values.config.argoCD.option | quote }}
         - name: argocd-version
-          value: v1.7.7
+          value: {{ .Values.config.argoCD.version }}
       runAfter:
         - build-and-publish-image
       taskRef:
