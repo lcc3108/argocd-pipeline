@@ -62,7 +62,7 @@ spec:
           name: image-$(tt.params.git-repo-name)-$(uid)
       - name: app-config
         resourceRef:
-          name: git-config
+          name: git-config-$(uid)
       serviceAccountName: {{ .Values.config.serviceAccountName }}
 
 
