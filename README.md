@@ -1,1 +1,1 @@
-argocd-pipeline
+git-ops
