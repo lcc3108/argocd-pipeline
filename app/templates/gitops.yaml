@@ -10,13 +10,20 @@ spec:
       type: string
   steps:
     - name: update-deploy
-      image: docker.io/alpine/git:v2.26.2
+      image: mikefarah/yq:3.3.4
       command:
-        - /kaniko/executor
+        - yq 
       args:
-        - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.image.url)
-        - --context=$(params.pathToContext)
-    
+        - w
+        - app/values.yaml
+        - 'config.apps(name==$(params.application-name)).version'
+        - $(params.git-revision)
+    - name: push-config-repo
+      image: docker.io/alpine/git:v2.26.2
+      script: |
+        git config --global user.email {{ .Values.config.email }}
+        git config --global user.name {{ .Values.config.user }}
+        git commit -m "auto commit"
+        git push
   workspaces:
   - name: config-repo

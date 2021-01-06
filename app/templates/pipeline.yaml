@@ -32,6 +32,9 @@ spec:
         inputs:
           - name: app-config
             resource: app-config
+      taskRef:
+        kind: Task
+        name: gitops-task
       params:
       - name: application-name
         value: $(params.application-name)
