@@ -5,8 +5,6 @@ metadata:
 spec:
   params:
     - name: application-name
-      description: >-
-      build appliction name in argocd
   resources:
     - name: source
       type: git
