@@ -19,7 +19,7 @@ spec:
     - name: VESION
       value: $(git-revision)
     - name: BRANCH
-      value: $(resources.inputs.refspec)
+      value: $(resources.inputs.revision)
   steps:
     - name: update-deploy
       image: mikefarah/yq:3.3.4
