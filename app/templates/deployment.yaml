@@ -1,0 +1,25 @@
+{{ range .Values.config.apps }}
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  replicas: {{ default 1  .replicaCount | int }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+      - name: {{ .name }}
+        image: "{{ $.Values.config.dockerRepo.url }}/{{ .name }}:{{ default "latest" .version  }}"
+        imagePullPolicy: IfNotPresent
+        {{ if .service }}
+        ports:
+        {{ toYaml .service | nindent 8 }}
+        {{ end }}
+{{ end }}

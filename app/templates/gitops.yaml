@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: gitops-task
+spec:
+  params:
+    - name: application-name
+      type: string
+    - name: git-revision
+      type: string
+  steps:
+    - name: update-deploy
+      image: docker.io/alpine/git:v2.26.2
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.pathToDockerFile)
+        - --destination=$(resources.outputs.image.url)
+        - --context=$(params.pathToContext)
+    
+  workspaces:
+  - name: config-repo

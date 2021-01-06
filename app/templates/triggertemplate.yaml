@@ -11,6 +11,17 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
+      name: git-config
+    spec:
+      params:
+      - name: url
+        value: {{ .Values.config.url }}
+      - name: revision
+        value: init-gitops
+      type: git
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
       name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)
     spec:
       params:
@@ -37,7 +48,9 @@ spec:
     spec:
       params:
       - name: image
-        value: '$(params.git-repo-name):$(params.git-revision)' 
+        value: '$(params.git-repo-name):$(params.git-revision)'
+      - name: git-revision
+        value: $(params.git-revision)
       pipelineRef:
         name: pipeline
       resources:
@@ -47,6 +60,9 @@ spec:
       - name: app-image
         resourceRef:
           name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+      - name: app-config
+        resourceRef:
+          name: git-config
       serviceAccountName: {{ .Values.config.serviceAccountName }}
 
 
@@ -72,11 +88,11 @@ kind: EventListener
 metadata:
   name: event-listener
 spec:
-  serviceAccountName: pipeline
+  serviceAccountName: {{ .Values.config.serviceAccountName }}
   triggers:
   - bindings:
-    - ref: node-web-app-tb
+    - ref: triger-template
     template:
-      ref: node-web-app-tt
+      ref: trigger-binding
 
 ---
