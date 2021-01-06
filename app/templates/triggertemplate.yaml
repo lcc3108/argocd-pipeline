@@ -39,7 +39,7 @@ spec:
     spec:
       params:
       - name: url
-        value: {{ .Values.config.dockerRepo.url }}/web-node-app:$(tt.params.git-revision)
+        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.git-revision)
       type: image
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
