@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: triger-template
+  name: trigger-template
 spec:
   params: 
   - name: git-repo-url
@@ -11,7 +11,18 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+      name: git-config-$(uid)
+    spec:
+      params:
+      - name: url
+        value: https://{{ .Values.config.url }}
+      - name: refspec
+        value: master
+      type: git
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: git-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
       - name: url
@@ -24,29 +35,34 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+      name: image-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
       - name: url
-        value: {{ .Values.config.dockerRepo.url }}/web-node-app:$(tt.params.git-revision)
+        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.git-revision)
       type: image
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
     metadata:
-      generateName: $(tt.params.git-repo-name)-$(tt.params.git-revision)-run
+      generateName: run-$(tt.params.git-repo-name)-$(uid)-
     spec:
       params:
-      - name: image
-        value: '$(params.git-repo-name):$(params.git-revision)' 
+      - name: application-name
+        value: $(params.git-repo-name)
+      - name: git-revision
+        value: $(params.git-revision)
       pipelineRef:
         name: pipeline
       resources:
       - name: app-source
         resourceRef:
-          name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+          name: git-$(tt.params.git-repo-name)-$(uid)
       - name: app-image
         resourceRef:
-          name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)
+          name: image-$(tt.params.git-repo-name)-$(uid)
+      - name: app-config
+        resourceRef:
+          name: git-config-$(uid)
       serviceAccountName: {{ .Values.config.serviceAccountName }}
 
 
@@ -72,11 +88,11 @@ kind: EventListener
 metadata:
   name: event-listener
 spec:
-  serviceAccountName: pipeline
+  serviceAccountName: {{ .Values.config.serviceAccountName }}
   triggers:
   - bindings:
-    - ref: node-web-app-tb
+    - ref: trigger-binding
     template:
-      ref: node-web-app-tt
+      ref: trigger-template
 
 ---

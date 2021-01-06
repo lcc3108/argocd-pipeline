@@ -1,0 +1,15 @@
+{{- range .Values.config.apps }}
+{{- if .service -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  type: ClusterIP
+  ports:
+{{ toYaml .service | nindent 2}}
+  selector:
+    app: {{ .name }}
+{{- end -}}
+{{ end -}}

@@ -3,37 +3,58 @@ kind: Pipeline
 metadata:
   name: pipeline
 spec:
+  # workspaces
+  # - name: config-repo
   params:
     - name: application-name
-      description: >-
-      build appliction name in argocd
+    - name: git-revision
   resources:
-    - name: source
+    - name: app-source
       type: git
-    - name: image
+    - name: app-config
+      type: git
+    - name: app-image
       type: image
   tasks:
     - name: build-and-publish-image
       resources:
         inputs:
-          - name: source
-            resource: source
+          - name: app-source
+            resource: app-source
         outputs:
-          - name: image
-            resource: image
+          - name: app-image
+            resource: app-image
       taskRef:
         kind: Task
         name: source-to-image
-    - name: argocd-sync-deployment
-      params:
-        - name: application-name
-          value: node-web-app
-        - name: flags
-          value: '--insecure --grpc-web'
-        - name: argocd-version
-          value: v1.7.7
+    - name: update-gitops-repo
+      resources:
+        inputs:
+          - name: app-config
+            resource: app-config
+      taskRef:
+        kind: Task
+        name: gitops-task
       runAfter:
         - build-and-publish-image
+      params:
+      - name: application-name
+        value: $(params.application-name)
+      - name: git-revision
+        value: $(params.git-revision)
+      # workspaces:
+      # - name: config-repo
+      #   workspace: config-repo
+    - name: argocd-sync-deployment
+      params:
+      - name: application-name
+        value: $(params.application-name)
+      - name: flags
+        value: {{ .Values.config.argoCD.option | quote }}
+      - name: argocd-version
+        value: {{ .Values.config.argoCD.version }}
+      runAfter:
+        - update-gitops-repo
       taskRef:
         kind: Task
         name: argocd-task-sync-and-wait

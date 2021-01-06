@@ -1,16 +1,22 @@
 config:
+  url: github.com/lcc3108/git-ops
+  email: dlacocjf32@gmail.com
+  user: lcc3108
   argoCD:
     version: v1.7.7
     url: argocd.lcc3108.ga
+    option:  '--insecure --grpc-web'
   dockerRepo:
-    url: harbor.lcc3108.ga
+    url: harbor.lcc3108.ga/library
   serviceAccountName: builder-bot
   apps:
   - name: node-web-app
+    version: 0.0.0
     namespace: node-web-project
-    svn:
-      type: git
+    git:
       url: github.com/lcc3108/node-web-app
-    docker:
-      imageName: node-web-app
-    useStaging : true
+      private: false
+    replicaCount: 1
+    service:
+    - port: 80
+      name: http

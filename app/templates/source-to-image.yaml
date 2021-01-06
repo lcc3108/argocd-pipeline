@@ -7,19 +7,19 @@ spec:
     - name: pathToDockerFile
       type: string
       description: The path to the dockerfile to build
-      default: $(resources.inputs.source.path)/Dockerfile
+      default: $(resources.inputs.app-source.path)/Dockerfile
     - name: pathToContext
       type: string
       description: |
         The build context used by Kaniko
         (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-      default: $(resources.inputs.source.path)
+      default: $(resources.inputs.app-source.path)
   resources:
     inputs:
-      - name: source
+      - name: app-source
         type: git
     outputs:
-      - name: image
+      - name: app-image
         type: image
   steps:
     - name: build-and-push
@@ -32,5 +32,6 @@ spec:
         - /kaniko/executor
       args:
         - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.image.url)
+        - --destination=$(resources.outputs.app-image.url)
         - --context=$(params.pathToContext)
+

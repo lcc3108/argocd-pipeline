@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: gitops-task
+spec:
+  params:
+    - name: application-name
+      type: string
+    - name: git-revision
+      type: string
+  resources:
+    inputs:
+      - name: app-config
+        type: git
+  stepTemplate:
+    env:
+    - name: APP
+      value: $(prams.application-name)
+    - name: VESION
+      value: $(git-revision)
+    - name: BRANCH
+      value: $(resources.inputs.refspec)
+  steps:
+    - name: update-deploy
+      image: mikefarah/yq:3.3.4
+      command: [yq, w, -i]
+      args: [$(resources.inputs.app-config.path)/app/values.yaml, config.apps(name==$APP).version, $VESION]
+    - name: push-config-repo
+      image: docker.io/alpine/git:v2.26.2
+      script: |
+        cd $(resources.inputs.app-config.path)
+        git config --global user.email {{ .Values.config.email }}
+        git config --global user.name {{ .Values.config.user }}
+        git checkout $BRANCH
+        git add .
+        git commit -m "update $APP"
+        git push
+  # workspaces:
+  # - name: config-repo
