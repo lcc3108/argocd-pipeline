@@ -17,5 +17,4 @@ config:
     replicaCount: 1
     service:
     - port: 80
-      scheme: HTTP
       name: http

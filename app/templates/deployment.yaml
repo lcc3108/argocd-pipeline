@@ -20,6 +20,9 @@ spec:
         imagePullPolicy: IfNotPresent
         {{ if .service }}
         ports:
-        {{ toYaml .service | nindent 8 }}
+        {{- range .service }}
+          - containerPort: {{ .port }}
+            name: {{ .name }}
+        {{ end -}}
         {{ end }}
 {{ end }}
