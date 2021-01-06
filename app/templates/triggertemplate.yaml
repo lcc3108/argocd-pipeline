@@ -11,17 +11,6 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: git-config-$(uid)
-    spec:
-      params:
-      - name: url
-        value: https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
-      - name: revision
-        value: master
-      type: git
-  - apiVersion: tekton.dev/v1alpha1
-    kind: PipelineResource
-    metadata:
       name: git-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
@@ -60,9 +49,6 @@ spec:
       - name: app-image
         resourceRef:
           name: image-$(tt.params.git-repo-name)-$(uid)
-      - name: app-config
-        resourceRef:
-          name: git-config-$(uid)
       serviceAccountName: {{ .Values.config.serviceAccountName }}
 
 

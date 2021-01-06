@@ -15,30 +15,31 @@ spec:
     env:
     - name: APP
       value: $(params.app-name)
-    - name: VESION
-      value: $(git-revision)
+    - name: REVISION
+      value: $(params.git-revision)
     - name: DEPLOY_ENV
       value: $(params.env)
   steps:
     - name: git-clone
       image: docker.io/alpine/git:v2.26.2
       script: |
+        echo "DEBUG: APP: $APP, REVISION: $REVISION, DEPLOY_ENV: $DEPLOY_ENV"
         git config --global user.email {{ .Values.config.email }}
         git config --global user.name {{ .Values.config.user }}
-        git clone https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
+        git clone -b master --single-branch https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
         cd {{ .Values.config.repo }}
         git branch $DEPLOY_ENV
         git checkout $DEPLOY_ENV
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       command: [yq, w, -i]
-      args: [{{ .Values.config.repo }}/app/values.yaml, config.apps(name==$APP).version, $VESION]
+      args: [{{ .Values.config.repo }}/app/values.yaml, apps(name==$APP).version, $REVISION]
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
         cd {{ .Values.config.repo }}
         git add .
         git commit -m "update $APP"
-        git push
+        git push origin $DEPLOY_ENV --force
   # workspaces:
   # - name: config-repo
