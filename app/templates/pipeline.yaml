@@ -30,11 +30,13 @@ spec:
     - name: update-gitops-repo
       resources:
         inputs:
-          - name: app-config
-            resource: app-config
+          - name: app-source
+            resource: app-source
       taskRef:
         kind: Task
         name: gitops-task
+      runAfter:
+        - build-and-publish-image
       params:
       - name: application-name
         value: $(params.application-name)
@@ -52,7 +54,7 @@ spec:
       - name: argocd-version
         value: {{ .Values.config.argoCD.version }}
       runAfter:
-        - build-and-publish-image
+        - update-gitops-repo
       taskRef:
         kind: Task
         name: argocd-task-sync-and-wait

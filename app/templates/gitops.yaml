@@ -8,6 +8,10 @@ spec:
       type: string
     - name: git-revision
       type: string
+  resources:
+    inputs:
+      - name: app-source
+        type: git
   steps:
     - name: update-deploy
       image: mikefarah/yq:3.3.4
