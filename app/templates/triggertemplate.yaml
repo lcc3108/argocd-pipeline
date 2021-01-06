@@ -16,7 +16,7 @@ spec:
       params:
       - name: url
         value: https://{{ .Values.config.url }}
-      - name: refspec
+      - name: revision
         value: master
       type: git
   - apiVersion: tekton.dev/v1alpha1
