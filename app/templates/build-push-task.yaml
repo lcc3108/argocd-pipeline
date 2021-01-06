@@ -16,10 +16,10 @@ spec:
       default: $(resources.inputs.source.path)
   resources:
     inputs:
-      - name: source
+      - name: app-source
         type: git
     outputs:
-      - name: image
+      - name: app-image
         type: image
   steps:
     - name: build-and-push
