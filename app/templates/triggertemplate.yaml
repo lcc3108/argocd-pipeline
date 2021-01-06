@@ -91,7 +91,7 @@ spec:
   serviceAccountName: {{ .Values.config.serviceAccountName }}
   triggers:
   - bindings:
-    - ref: triger-binding
+    - ref: trigger-binding
     template:
       ref: trigger-template
 
