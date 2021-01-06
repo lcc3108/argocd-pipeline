@@ -22,7 +22,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)-$(uid)
+      name: git-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
       - name: url
@@ -35,7 +35,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
     metadata:
-      name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)-$(uid)
+      name: image-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
       - name: url
@@ -44,7 +44,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
     metadata:
-      generateName: run-$(tt.params.git-repo-name)-$(tt.params.git-revision)-$(uid)-
+      generateName: run-$(tt.params.git-repo-name)-$(uid)-
     spec:
       params:
       - name: application-name
@@ -56,10 +56,10 @@ spec:
       resources:
       - name: app-source
         resourceRef:
-          name: git-$(tt.params.git-repo-name)-$(tt.params.git-revision)-$(uid)
+          name: git-$(tt.params.git-repo-name)-$(uid)
       - name: app-image
         resourceRef:
-          name: image-$(tt.params.git-repo-name)-$(tt.params.git-revision)-$(uid)
+          name: image-$(tt.params.git-repo-name)-$(uid)
       - name: app-config
         resourceRef:
           name: git-config
