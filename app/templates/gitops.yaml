@@ -10,7 +10,7 @@ spec:
       type: string
   resources:
     inputs:
-      - name: app-source
+      - name: app-config
         type: git
   steps:
     - name: update-deploy
@@ -19,16 +19,16 @@ spec:
         - yq 
       args:
         - w
-        - $(resources.inputs.app-source.path)/app/values.yaml
+        - $(resources.inputs.app-config.path)/app/values.yaml
         - 'config.apps(name==$(params.application-name)).version'
         - $(params.git-revision)
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
-        cd $(resources.inputs.app-source.path)
+        cd $(resources.inputs.app-config.path)
         git config --global user.email {{ .Values.config.email }}
         git config --global user.name {{ .Values.config.user }}
         git commit -m "auto commit"
         git push
-  workspaces:
-  - name: config-repo
+  # workspaces:
+  # - name: config-repo

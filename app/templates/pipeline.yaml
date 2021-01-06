@@ -30,8 +30,8 @@ spec:
     - name: update-gitops-repo
       resources:
         inputs:
-          - name: app-source
-            resource: app-source
+          - name: app-config
+            resource: app-config
       taskRef:
         kind: Task
         name: gitops-task
