@@ -16,7 +16,7 @@ spec:
     authentication either a username/password or an authentication token.
 
   params:
-    - name: application-name
+    - name: app-name
       description: name of the application to sync
     - name: revision
       description: the revision to sync to
@@ -27,17 +27,17 @@ spec:
       default: v1.0.2
   stepTemplate:
     env:
-    - name: ARGOCD_SERVER
-      value: {{ .Values.config.argoCD.url }}
+      - name: ARGOCD_SERVER
+        value: {{ .Values.config.argoCD.url }}
     envFrom:
       - secretRef:
-          name: argocd-env-secret  # used for authentication (username/password or auth token)
+          name: argocd-env-secret # used for authentication (username/password or auth token)
   steps:
     - name: sync
       image: docker.io/argoproj/argocd:$(params.argocd-version)
       script: |
-        argocd app sync $(params.application-name) --revision $(params.revision) $(params.flags) --auth-token $ARGOCD_AUTH_TOKEN --prune
+        argocd app sync $(params.app-name) --revision $(params.revision) $(params.flags) --auth-token $ARGOCD_AUTH_TOKEN --prune
     - name: wait
       image: docker.io/argoproj/argocd:$(params.argocd-version)
       script: |
-        argocd app wait $(params.application-name) --health $(params.flags) --auth-token $ARGOCD_AUTH_TOKEN
+        argocd app wait $(params.app-name) --health $(params.flags) --auth-token $ARGOCD_AUTH_TOKEN

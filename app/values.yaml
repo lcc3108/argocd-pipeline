@@ -1,5 +1,5 @@
 config:
-  url: github.com/lcc3108/git-ops
+  repo: git-ops 
   email: dlacocjf32@gmail.com
   user: lcc3108
   argoCD:
@@ -9,14 +9,14 @@ config:
   dockerRepo:
     url: harbor.lcc3108.ga/library
   serviceAccountName: builder-bot
-  apps:
-  - name: node-web-app
-    version: 0.0.0
-    namespace: node-web-project
-    git:
-      url: github.com/lcc3108/node-web-app
-      private: false
-    replicaCount: 1
-    service:
-    - port: 80
-      name: http
+apps:
+- name: node-web-app
+  version: 0.0.0
+  namespace: node-web-project
+  git:
+    url: github.com/lcc3108/node-web-app
+    private: false
+  replicaCount: 1
+  service:
+  - port: 80
+    name: http

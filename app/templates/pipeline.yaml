@@ -6,7 +6,7 @@ spec:
   # workspaces
   # - name: config-repo
   params:
-    - name: application-name
+    - name: app-name
     - name: git-revision
   resources:
     - name: app-source
@@ -38,21 +38,21 @@ spec:
       runAfter:
         - build-and-publish-image
       params:
-      - name: application-name
-        value: $(params.application-name)
-      - name: git-revision
-        value: $(params.git-revision)
+        - name: app-name
+          value: $(params.app-name)
+        - name: git-revision
+          value: $(params.git-revision)
       # workspaces:
       # - name: config-repo
       #   workspace: config-repo
     - name: argocd-sync-deployment
       params:
-      - name: application-name
-        value: $(params.application-name)
-      - name: flags
-        value: {{ .Values.config.argoCD.option | quote }}
-      - name: argocd-version
-        value: {{ .Values.config.argoCD.version }}
+        - name: app-name
+          value: $(params.app-name)
+        - name: flags
+          value: {{ .Values.config.argoCD.option | quote }}
+        - name: argocd-version
+          value: {{ .Values.config.argoCD.version }}
       runAfter:
         - update-gitops-repo
       taskRef:

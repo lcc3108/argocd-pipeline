@@ -4,25 +4,27 @@ metadata:
   name: gitops-task
 spec:
   params:
-    - name: application-name
+    - name: app-name
       type: string
     - name: git-revision
       type: string
-  resources:
-    inputs:
-      - name: app-config
-        type: git
   stepTemplate:
     env:
     - name: APP
-      value: $(prams.application-name)
+      value: $(params.app-name)
     - name: VESION
       value: $(git-revision)
   steps:
+    - name: git clone
+      image: docker.io/alpine/git:v2.26.2
+      script: |
+        git config --global user.email {{ .Values.config.email }}
+        git config --global user.name {{ .Values.config.user }}
+        git clone https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
     - name: update-deploy
       image: mikefarah/yq:3.3.4
       command: [yq, w, -i]
-      args: [$(resources.inputs.app-config.path)/app/values.yaml, config.apps(name==$APP).version, $VESION]
+      args: [{{ .Values.config.repo }}/app/values.yaml, config.apps(name==$APP).version, $VESION]
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |

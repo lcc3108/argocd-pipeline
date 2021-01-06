@@ -15,7 +15,7 @@ spec:
     spec:
       params:
       - name: url
-        value: https://{{ .Values.config.url }}
+        value: https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
       - name: revision
         value: master
       type: git
@@ -47,10 +47,10 @@ spec:
       generateName: run-$(tt.params.git-repo-name)-$(uid)-
     spec:
       params:
-      - name: application-name
-        value: $(params.git-repo-name)
+      - name: app-name
+        value: $(tt.params.git-repo-name)
       - name: git-revision
-        value: $(params.git-revision)
+        value: $(tt.params.git-revision)
       pipelineRef:
         name: pipeline
       resources:
