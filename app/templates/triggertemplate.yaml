@@ -47,8 +47,8 @@ spec:
       generateName: $(tt.params.git-repo-name)-$(tt.params.git-revision)-run
     spec:
       params:
-      - name: image
-        value: '$(params.git-repo-name):$(params.git-revision)'
+      - name: application-name
+        value: $(params.git-repo-name)
       - name: git-revision
         value: $(params.git-revision)
       pipelineRef:
