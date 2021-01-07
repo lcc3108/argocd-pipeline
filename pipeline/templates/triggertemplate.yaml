@@ -85,33 +85,48 @@ metadata:
 spec:
   serviceAccountName: {{ .Values.config.serviceAccountName }}
   triggers:
-  - name: parsing-request
+  - name: master
     interceptors:
-    - cel:
-        overlays:
-        - key: body.short_sha1
-          expression: "body.pull_request.head.sha.truncate(7)"
-        - key: body.branch_name
-          expression: "body.ref.split('/')[2]"
-  - interceptors:
       - cel:
           filter: "body.branch_name == 'master'"
           overlays:
+          - key: body.short_sha1
+            expression: "body.pull_request.head.sha.truncate(7)"
+          - key: body.branch_name
+            expression: "body.ref.split('/')[2]"
           - key: body.deploy_env
             expression: prod
-  - interceptors:
+    bindings:
+    - ref: trigger-binding
+    template:
+      ref: trigger-template
+  - name: dev
+    interceptors:
       - cel:
           filter: "body.branch_name == 'develop'"
           overlays:
+          - key: body.short_sha1
+            expression: "body.pull_request.head.sha.truncate(7)"
+          - key: body.branch_name
+            expression: "body.ref.split('/')[2]"
           - key: body.deploy_env
             expression: dev
-  - interceptors:
+    bindings:
+    - ref: trigger-binding
+    template:
+      ref: trigger-template
+  - name: stage
+    interceptors:
       - cel:
           filter: "body.branch_name == 'release'"
           overlays:
+          - key: body.short_sha1
+            expression: "body.pull_request.head.sha.truncate(7)"
+          - key: body.branch_name
+            expression: "body.ref.split('/')[2]"
           - key: body.deploy_env
             expression: stage
-  - bindings:
+    bindings:
     - ref: trigger-binding
     template:
       ref: trigger-template
