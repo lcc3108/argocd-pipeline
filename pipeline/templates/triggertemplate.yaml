@@ -55,7 +55,7 @@ spec:
       - name: app-image
         resourceRef:
           name: image-$(tt.params.git-repo-name)-$(uid)
-      serviceAccount.name: {{ .Values.config.serviceAccount.name }}
+      serviceAccountName: {{ .Values.config.serviceAccount.name }}
 
 
 --- 
@@ -83,7 +83,7 @@ kind: EventListener
 metadata:
   name: event-listener
 spec:
-  serviceAccount.name: {{ .Values.config.serviceAccount.name }}
+  serviceAccountName: {{ .Values.config.serviceAccount.name }}
   triggers:
   - name: master
     interceptors:
