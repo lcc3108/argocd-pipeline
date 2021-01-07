@@ -73,9 +73,9 @@ spec:
   - name: git-repo-name
     value: $(body.repository.name)
   - name: git-branch
-    value: $(body.branch_name)
+    value: $(extensions.branch_name)
   - name: deploy-env
-    value: $(body.deploy_env)
+    value: $(extensions.deploy_env)
 ---
 
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -91,12 +91,15 @@ spec:
           filter: |
             body.ref.split('/')[2] == 'master'
           overlays:
-          - key: body.short_sha1
-            expression: "body.head_commit.id.truncate(7)"
-          - key: body.branch_name
-            expression: "body.ref.split('/')[2]"
-          - key: body.deploy_env
-            expression: prod
+          - key: short_sha
+            expression: |
+             "body.head_commit.id.truncate(7)"
+          - key: branch_name
+            expression: |
+            "body.ref.split('/')[2]"
+          - key: deploy_env
+            expression: |
+            '''prod'''
     bindings:
     - ref: trigger-binding
     template:
