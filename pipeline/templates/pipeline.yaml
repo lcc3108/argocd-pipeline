@@ -56,9 +56,9 @@ spec:
         - name: app-name
           value: $(params.app-name)
         - name: flags
-          value: { { .Values.config.argoCD.option | quote } }
+          value: {{ .Values.config.argoCD.option | quote }}
         - name: argocd-version
-          value: { { .Values.config.argoCD.version } }
+          value: {{ .Values.config.argoCD.version }}
         - name: revision
           value: $(params.git-revision)
       runAfter:
