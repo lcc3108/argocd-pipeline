@@ -1,14 +1,7 @@
 config:
-  repo: git-ops 
-  email: dlacocjf32@gmail.com
-  user: lcc3108
-  argoCD:
-    version: v1.7.7
-    url: argocd.lcc3108.ga
-    option:  '--insecure --grpc-web'
+  env: ""
   dockerRepo:
     url: harbor.lcc3108.ga/library
-  serviceAccountName: builder-bot
 apps:
 - name: node-web-app
   version: 0.0.0
