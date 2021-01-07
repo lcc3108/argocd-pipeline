@@ -8,12 +8,27 @@ spec:
   params:
     - name: app-name
     - name: git-revision
+    - name: git-branch-name
+    - name: deploy-env
   resources:
     - name: app-source
       type: git
     - name: app-image
       type: image
   tasks:
+    - name: params-check
+      params:
+        - name: app-name
+          value: $(params.app-name)
+        - name: git-revision
+          value: $(params.revision)
+        - name: git-branch-name
+          value: $(params.branch-name)
+        - name: deploy-env
+          value: $(params.deploy-env)
+      taskRef:
+        kind: Task
+        name: params-check
     - name: build-and-publish-image
       resources:
         inputs:

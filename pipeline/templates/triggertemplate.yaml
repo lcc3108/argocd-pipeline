@@ -7,6 +7,8 @@ spec:
   - name: git-repo-url
   - name: git-repo-name
   - name: git-revision
+  - name: git-branch-name
+  - name: deploy-env
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
@@ -40,6 +42,10 @@ spec:
         value: $(tt.params.git-repo-name)
       - name: git-revision
         value: $(tt.params.git-revision)
+      - name: git-branch
+        value: $(tt.params.git-branch)
+      - name: deploy-env
+        value: $(tt.params.deploy-env)
       pipelineRef:
         name: pipeline
       resources:
@@ -66,7 +72,10 @@ spec:
     value: $(body.head_commit.id)
   - name: git-repo-name
     value: $(body.repository.name)
-
+  - name: git-branch-name
+    value: $(body.branch_name)
+  - name: deploy-env
+    value: $(body.deploy_env)
 ---
 
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -76,9 +85,36 @@ metadata:
 spec:
   serviceAccountName: {{ .Values.config.serviceAccountName }}
   triggers:
+  - name: parsing-request
+    interceptors:
+    - cel:
+        overlays:
+        - key: body.short_sha1
+          expression: "body.pull_request.head.sha.truncate(7)"
+        - key: body.branch_name
+          expression: "body.ref.split('/')[2]"
+  - interceptors:
+      - cel:
+          filter: "body.branch_name == 'master'"
+          overlays:
+          - key: body.deploy_env
+            expression: prod
+  - interceptors:
+      - cel:
+          filter: "body.branch_name == 'develop'"
+          overlays:
+          - key: body.deploy_env
+            expression: dev
+  - interceptors:
+      - cel:
+          filter: "body.branch_name == 'release'"
+          overlays:
+          - key: body.deploy_env
+            expression: stage
   - bindings:
     - ref: trigger-binding
     template:
       ref: trigger-template
+          
 
 ---
