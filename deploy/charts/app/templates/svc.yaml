@@ -1,11 +1,12 @@
 {{- range .Values.apps }}
 {{- if .service -}}
-{{ $fullnamespace := printf "%s-%s" .namespace $.Values.global.env | trunc 63 | trimSuffix "-" }}
+{{ $fullname := printf "%s-%s" .name $.Values.global.env | trunc 63 | trimSuffix "-" }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .name }}
-  namespace: {{ $fullnamespace }}
+  name: {{ $fullname }}
+  namespace: {{ .namespace }}
 spec:
   type: ClusterIP
   ports:
