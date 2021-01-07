@@ -33,7 +33,7 @@ spec:
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       script: |
-        yq w -i {{ .Values.config.repo }}/app/values.yaml "apps(name==$APP).version" $VERSION
+        yq w -i {{ .Values.config.repo }}/deploy/values.yaml.$DEPLOY_ENV "apps(name==$APP).version" $VERSION
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
