@@ -32,8 +32,8 @@ spec:
         git checkout $DEPLOY_ENV
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
-      command: [yq, w, -i]
-      args: [{{ .Values.config.repo }}/app/values.yaml, apps(name==$APP).version, $REVISION]
+      script: |
+        yq w -i {{ .Values.config.repo }}/app/values.yaml "apps(name==$APP).version" $REVISION
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
