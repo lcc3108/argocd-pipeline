@@ -89,10 +89,10 @@ spec:
     interceptors:
       - cel:
           filter: |
-            body.ref.split('/')[2] == master
+            body.ref.split('/')[2] == 'master'
           overlays:
           - key: body.short_sha1
-            expression: "body.pull_request.head.sha.truncate(7)"
+            expression: "body.head_commit.id.truncate(7)"
           - key: body.branch_name
             expression: "body.ref.split('/')[2]"
           - key: body.deploy_env
@@ -108,7 +108,7 @@ spec:
   #           body.ref.split('/')[2] == develop
   #         overlays:
   #         - key: body.short_sha1
-  #           expression: "body.pull_request.head.sha.truncate(7)"
+  #           expression: "body.head_commit.id.truncate(7)"
   #         - key: body.branch_name
   #           expression: "body.ref.split('/')[2]"
   #         - key: body.deploy_env
@@ -124,7 +124,7 @@ spec:
   #           body.ref.split('/')[2] == release
   #         overlays:
   #         - key: body.short_sha1
-  #           expression: "body.pull_request.head.sha.truncate(7)"
+  #           expression: "body.head_commit.id.truncate(7)"
   #         - key: body.branch_name
   #           expression: "body.ref.split('/')[2]"
   #         - key: body.deploy_env
