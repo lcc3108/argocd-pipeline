@@ -12,4 +12,4 @@ config:
   serviceAccount:
     name: builder-bot
     gitSecret: github-lcc3108
-    dockerSecret: docker-lcc3108
+    dockerSecret: harbor-lcc3108
