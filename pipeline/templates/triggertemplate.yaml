@@ -55,7 +55,7 @@ spec:
       - name: app-image
         resourceRef:
           name: image-$(tt.params.git-repo-name)-$(uid)
-      serviceAccountName: {{ .Values.config.serviceAccountName }}
+      serviceAccount.name: {{ .Values.config.serviceAccount.name }}
 
 
 --- 
@@ -83,12 +83,13 @@ kind: EventListener
 metadata:
   name: event-listener
 spec:
-  serviceAccountName: {{ .Values.config.serviceAccountName }}
+  serviceAccount.name: {{ .Values.config.serviceAccount.name }}
   triggers:
   - name: master
     interceptors:
       - cel:
-          filter: "body.branch_name == 'master'"
+          filter: |
+            body.ref.split('/')[2] == master
           overlays:
           - key: body.short_sha1
             expression: "body.pull_request.head.sha.truncate(7)"
@@ -100,36 +101,38 @@ spec:
     - ref: trigger-binding
     template:
       ref: trigger-template
-  - name: dev
-    interceptors:
-      - cel:
-          filter: "body.branch_name == 'develop'"
-          overlays:
-          - key: body.short_sha1
-            expression: "body.pull_request.head.sha.truncate(7)"
-          - key: body.branch_name
-            expression: "body.ref.split('/')[2]"
-          - key: body.deploy_env
-            expression: dev
-    bindings:
-    - ref: trigger-binding
-    template:
-      ref: trigger-template
-  - name: stage
-    interceptors:
-      - cel:
-          filter: "body.branch_name == 'release'"
-          overlays:
-          - key: body.short_sha1
-            expression: "body.pull_request.head.sha.truncate(7)"
-          - key: body.branch_name
-            expression: "body.ref.split('/')[2]"
-          - key: body.deploy_env
-            expression: stage
-    bindings:
-    - ref: trigger-binding
-    template:
-      ref: trigger-template
+  # - name: dev
+  #   interceptors:
+  #     - cel:
+  #         filter: |
+  #           body.ref.split('/')[2] == develop
+  #         overlays:
+  #         - key: body.short_sha1
+  #           expression: "body.pull_request.head.sha.truncate(7)"
+  #         - key: body.branch_name
+  #           expression: "body.ref.split('/')[2]"
+  #         - key: body.deploy_env
+  #           expression: dev
+  #   bindings:
+  #   - ref: trigger-binding
+  #   template:
+  #     ref: trigger-template
+  # - name: stage
+  #   interceptors:
+  #     - cel:
+  #         filter: |
+  #           body.ref.split('/')[2] == release
+  #         overlays:
+  #         - key: body.short_sha1
+  #           expression: "body.pull_request.head.sha.truncate(7)"
+  #         - key: body.branch_name
+  #           expression: "body.ref.split('/')[2]"
+  #         - key: body.deploy_env
+  #           expression: stage
+  #   bindings:
+  #   - ref: trigger-binding
+  #   template:
+  #     ref: trigger-template
           
 
 ---
