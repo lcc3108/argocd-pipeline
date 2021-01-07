@@ -10,6 +10,7 @@ spec:
     - name: git-revision
     - name: git-branch
     - name: deploy-env
+    - name: image-tag
   resources:
     - name: app-source
       type: git
@@ -49,8 +50,8 @@ spec:
       params:
         - name: app-name
           value: $(params.app-name)
-        - name: git-revision
-          value: $(params.git-revision)
+        - name: image-tag
+          value: $(params.image-tag)
     - name: argocd-sync-deployment
       params:
         - name: app-name

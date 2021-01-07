@@ -9,6 +9,7 @@ spec:
   - name: git-revision
   - name: git-branch
   - name: deploy-env
+  - name: image-tag
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
@@ -30,7 +31,7 @@ spec:
     spec:
       params:
       - name: url
-        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.git-revision)
+        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.image-tag)
       type: image
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -46,6 +47,8 @@ spec:
         value: $(tt.params.git-branch)
       - name: deploy-env
         value: $(tt.params.deploy-env)
+      - name: image-tag
+        value: $(tt.params.image-tag)
       pipelineRef:
         name: pipeline
       resources:
@@ -76,6 +79,8 @@ spec:
     value: $(extensions.branch_name)
   - name: deploy-env
     value: $(extensions.deploy_env)
+  - name: image-tag
+    value: $(extensions.short_sha)
 ---
 
 apiVersion: triggers.tekton.dev/v1alpha1
