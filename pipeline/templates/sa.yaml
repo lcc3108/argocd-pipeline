@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.config.serviceAccount.name }}
+secrets:
+- name: {{ .Values.config.serviceAccount.dockerSecret }}
+- name: {{ .Values.config.serviceAccount.gitSecret }}

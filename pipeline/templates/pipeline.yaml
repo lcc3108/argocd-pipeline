@@ -8,12 +8,28 @@ spec:
   params:
     - name: app-name
     - name: git-revision
+    - name: git-branch
+    - name: deploy-env
+    - name: image-tag
   resources:
     - name: app-source
       type: git
     - name: app-image
       type: image
   tasks:
+    - name: params-check
+      params:
+        - name: app-name
+          value: $(params.app-name)
+        - name: git-revision
+          value: $(params.git-revision)
+        - name: git-branch
+          value: $(params.git-branch)
+        - name: deploy-env
+          value: $(params.deploy-env)
+      taskRef:
+        kind: Task
+        name: params-check
     - name: build-and-publish-image
       resources:
         inputs:
@@ -34,18 +50,18 @@ spec:
       params:
         - name: app-name
           value: $(params.app-name)
-        - name: git-revision
-          value: $(params.git-revision)
+        - name: image-tag
+          value: $(params.image-tag)
     - name: argocd-sync-deployment
       params:
         - name: app-name
-          value: $(params.app-name)
+          value: {{ .Values.config.argoCD.name }}-$(params.deploy-env)
         - name: flags
           value: {{ .Values.config.argoCD.option | quote }}
         - name: argocd-version
           value: {{ .Values.config.argoCD.version }}
         - name: revision
-          value: $(params.git-revision)
+          value: $(params.deploy-env)
       runAfter:
         - update-gitops-repo
       taskRef:

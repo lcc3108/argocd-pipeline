@@ -6,7 +6,7 @@ spec:
   params:
     - name: app-name
       type: string
-    - name: git-revision
+    - name: image-tag
       type: string
     - name: env
       type: string
@@ -15,15 +15,15 @@ spec:
     env:
     - name: APP
       value: $(params.app-name)
-    - name: REVISION
-      value: $(params.git-revision)
+    - name: VERSION
+      value: $(params.image-tag)
     - name: DEPLOY_ENV
       value: $(params.env)
   steps:
     - name: git-clone
       image: docker.io/alpine/git:v2.26.2
       script: |
-        echo "DEBUG: APP: $APP, REVISION: $REVISION, DEPLOY_ENV: $DEPLOY_ENV"
+        echo "DEBUG: APP: $APP, VERSION: $VERSION, DEPLOY_ENV: $DEPLOY_ENV"
         git config --global user.email {{ .Values.config.email }}
         git config --global user.name {{ .Values.config.user }}
         git clone -b master --single-branch https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
@@ -32,8 +32,8 @@ spec:
         git checkout $DEPLOY_ENV
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
-      command: [yq, w, -i]
-      args: [{{ .Values.config.repo }}/app/values.yaml, apps(name==$APP).version, $REVISION]
+      script: |
+        yq w -i {{ .Values.config.repo }}/deploy/values.yaml.$DEPLOY_ENV "apps(name==$APP).version" $VERSION
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |

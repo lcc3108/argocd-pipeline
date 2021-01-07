@@ -1,0 +1,145 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: trigger-template
+spec:
+  params: 
+  - name: git-repo-url
+  - name: git-repo-name
+  - name: git-revision
+  - name: git-branch
+  - name: deploy-env
+  - name: image-tag
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: git-$(tt.params.git-repo-name)-$(uid)
+    spec:
+      params:
+      - name: url
+        value: $(tt.params.git-repo-url)
+      - name: revision
+        value: $(tt.params.git-revision)
+      - name: git-repo-name
+        value: $(tt.params.git-repo-name)
+      type: git
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineResource
+    metadata:
+      name: image-$(tt.params.git-repo-name)-$(uid)
+    spec:
+      params:
+      - name: url
+        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.image-tag)
+      type: image
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: run-$(tt.params.git-repo-name)-$(uid)-
+    spec:
+      params:
+      - name: app-name
+        value: $(tt.params.git-repo-name)
+      - name: git-revision
+        value: $(tt.params.git-revision)
+      - name: git-branch
+        value: $(tt.params.git-branch)
+      - name: deploy-env
+        value: $(tt.params.deploy-env)
+      - name: image-tag
+        value: $(tt.params.image-tag)
+      pipelineRef:
+        name: pipeline
+      resources:
+      - name: app-source
+        resourceRef:
+          name: git-$(tt.params.git-repo-name)-$(uid)
+      - name: app-image
+        resourceRef:
+          name: image-$(tt.params.git-repo-name)-$(uid)
+      serviceAccountName: {{ .Values.config.serviceAccount.name }}
+
+
+--- 
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: trigger-binding
+spec:
+  params:
+  - name: git-repo-url
+    value: $(body.repository.url)
+  - name: git-revision
+    value: $(body.head_commit.id)
+  - name: git-repo-name
+    value: $(body.repository.name)
+  - name: git-branch
+    value: $(extensions.branch_name)
+  - name: deploy-env
+    value: $(extensions.deploy_env)
+  - name: image-tag
+    value: $(extensions.short_sha)
+---
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: event-listener
+spec:
+  serviceAccountName: {{ .Values.config.serviceAccount.name }}
+  triggers:
+  - name: master
+    interceptors:
+      - cel:
+          filter: |
+            body.ref.split('/')[2] == 'master'
+          overlays:
+          - key: short_sha
+            expression: |
+              body.head_commit.id.truncate(7)
+          - key: branch_name
+            expression: |
+              body.ref.split('/')[2]
+          - key: deploy_env
+            expression: |
+              'prod'
+            
+    bindings:
+    - ref: trigger-binding
+    template:
+      ref: trigger-template
+  # - name: dev
+  #   interceptors:
+  #     - cel:
+  #         filter: |
+  #           body.ref.split('/')[2] == develop
+  #         overlays:
+  #         - key: body.short_sha1
+  #           expression: "body.head_commit.id.truncate(7)"
+  #         - key: body.branch_name
+  #           expression: "body.ref.split('/')[2]"
+  #         - key: body.deploy_env
+  #           expression: dev
+  #   bindings:
+  #   - ref: trigger-binding
+  #   template:
+  #     ref: trigger-template
+  # - name: stage
+  #   interceptors:
+  #     - cel:
+  #         filter: |
+  #           body.ref.split('/')[2] == release
+  #         overlays:
+  #         - key: body.short_sha1
+  #           expression: "body.head_commit.id.truncate(7)"
+  #         - key: body.branch_name
+  #           expression: "body.ref.split('/')[2]"
+  #         - key: body.deploy_env
+  #           expression: stage
+  #   bindings:
+  #   - ref: trigger-binding
+  #   template:
+  #     ref: trigger-template
+---

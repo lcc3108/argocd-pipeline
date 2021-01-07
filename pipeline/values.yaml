@@ -1,0 +1,15 @@
+config:
+  repo: git-ops 
+  email: dlacocjf32@gmail.com
+  user: lcc3108
+  argoCD:
+    name: lcc3108-gitops
+    version: v1.7.7
+    url: argocd.lcc3108.ga
+    option:  '--insecure --grpc-web'      
+  dockerRepo:
+    url: harbor.lcc3108.ga/library
+  serviceAccount:
+    name: builder-bot
+    gitSecret: github-lcc3108
+    dockerSecret: harbor-lcc3108
