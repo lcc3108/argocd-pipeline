@@ -6,12 +6,12 @@ spec:
   params:
     - name: app-name
     - name: git-revision
-    - name: git-branch-name
+    - name: git-branch
     - name: deploy-env
   steps:
     - name: params-check
       image: docker.io/alpine/git:v2.26.2
       script: |
-        echo $(params.app-name) $(params.git-revision) $(params.git-branch-name) $(params.deploy-env)
+        echo $(params.app-name) $(params.git-revision) $(params.git-branch) $(params.deploy-env)
   # workspaces:
   # - name: config-repo

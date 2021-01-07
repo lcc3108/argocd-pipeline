@@ -7,7 +7,7 @@ spec:
   - name: git-repo-url
   - name: git-repo-name
   - name: git-revision
-  - name: git-branch-name
+  - name: git-branch
   - name: deploy-env
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
@@ -72,7 +72,7 @@ spec:
     value: $(body.head_commit.id)
   - name: git-repo-name
     value: $(body.repository.name)
-  - name: git-branch-name
+  - name: git-branch
     value: $(body.branch_name)
   - name: deploy-env
     value: $(body.deploy_env)

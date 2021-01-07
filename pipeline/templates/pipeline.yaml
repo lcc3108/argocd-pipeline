@@ -8,7 +8,7 @@ spec:
   params:
     - name: app-name
     - name: git-revision
-    - name: git-branch-name
+    - name: git-branch
     - name: deploy-env
   resources:
     - name: app-source
@@ -21,9 +21,9 @@ spec:
         - name: app-name
           value: $(params.app-name)
         - name: git-revision
-          value: $(params.revision)
-        - name: git-branch-name
-          value: $(params.branch-name)
+          value: $(params.git-revision)
+        - name: git-branch
+          value: $(params.git-branch)
         - name: deploy-env
           value: $(params.deploy-env)
       taskRef:
@@ -56,9 +56,9 @@ spec:
         - name: app-name
           value: $(params.app-name)
         - name: flags
-          value: {{ .Values.config.argoCD.option | quote }}
+          value: { { .Values.config.argoCD.option | quote } }
         - name: argocd-version
-          value: {{ .Values.config.argoCD.version }}
+          value: { { .Values.config.argoCD.version } }
         - name: revision
           value: $(params.git-revision)
       runAfter:
