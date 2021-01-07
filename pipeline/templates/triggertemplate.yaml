@@ -98,13 +98,13 @@ spec:
           overlays:
           - key: short_sha
             expression: |
-              "body.head_commit.id.truncate(7)"
+              body.head_commit.id.truncate(7)
           - key: branch_name
             expression: |
-              "body.ref.split('/')[2]"
+              body.ref.split('/')[2]
           - key: deploy_env
             expression: |
-              '''prod'''
+              'prod'
             
     bindings:
     - ref: trigger-binding
