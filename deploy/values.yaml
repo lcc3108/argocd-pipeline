@@ -1,2 +1,2 @@
 global:
-  env: dev
+  env: prod

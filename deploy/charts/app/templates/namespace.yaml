@@ -1,0 +1,12 @@
+{{ $ns := dict }}
+{{- range $it := .Values.apps }}
+{{- if hasKey $ns $it.namespace -}}
+{{ else }}
+{{ $_ := set $ns $it.namespace $it.namespace }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $it.namespace }}
+{{ end -}}
+{{ end }}

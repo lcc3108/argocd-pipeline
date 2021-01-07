@@ -1,12 +1,11 @@
 {{ range .Values.apps }}
 {{ $fullname := printf "%s-%s" .name $.Values.global.env | trunc 63 | trimSuffix "-" }}
-{{ $fullnamespace := printf "%s-%s" .namespace $.Values.global.env | trunc 63 | trimSuffix "-" }}
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
   name: {{ $fullname }}
-  namespace: {{ $fullnamespace }}
+  namespace: {{ .namespace }}
 spec:
   selector:
     matchLabels:
@@ -19,7 +18,7 @@ spec:
     spec:
       containers:
       - name: {{ $fullname }}
-        image: "{{ $.Values.config.dockerRepo.url }}/{{ $fullname }}:{{ default "latest" .version  }}"
+        image: "{{ $.Values.config.dockerRepo.url }}/{{ .name }}:{{ default "latest" .version  }}"
         imagePullPolicy: IfNotPresent
         {{ if .service }}
         ports:
