@@ -17,12 +17,12 @@ spec:
       name: git-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
+      - name: name
+        value: $(tt.params.git-repo-name)
       - name: url
         value: $(tt.params.git-repo-url)
       - name: revision
         value: $(tt.params.git-sha)
-      - name: git-repo-name
-        value: $(tt.params.git-repo-name)
       type: git
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
@@ -30,6 +30,10 @@ spec:
       name: image-$(tt.params.git-repo-name)-$(uid)
     spec:
       params:
+      - name: name
+        value: $(tt.params.git-repo-name)
+      - name: tag
+        value: $(tt.params.git-short-sha)
       - name: url
         value: {{ tpl $.Values.dockerRepo.uri . }}/$(tt.params.git-repo-name):$(tt.params.git-short-sha)
       type: image

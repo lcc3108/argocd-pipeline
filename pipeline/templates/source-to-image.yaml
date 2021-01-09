@@ -25,7 +25,7 @@ spec:
     - name: search-image
       image: alpine
       script: |
-        curl -X https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/(params)
+        curl -X https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/$(resources.outputs.app-image.name)/artifacts/$(resources.outputs.app-image.tag)
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v0.16.0
       # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
