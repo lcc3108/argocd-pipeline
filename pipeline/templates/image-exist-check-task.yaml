@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: image-exist-check
+spec:
+  results:
+    - name: image-exist
+      description: if image exist true else false
+  resources:
+    inputs:
+      - name: app-image
+        type: image
+  steps:
+    - name: search-image
+      image: alpine
+      script: |
+        RESULT=false
+        if ! curl --fail https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/$(resources.outputs.app-image.name)/artifacts/$(resources.outputs.app-image.tag); then
+          RESULT=true
+        fi
+        echo $RESULT | tee $(results.image-exist.path)
+        

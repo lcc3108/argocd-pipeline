@@ -30,6 +30,14 @@ spec:
       taskRef:
         kind: Task
         name: params-check
+    - name: image-exist-check
+      resources:
+        inputs:
+          - name: app-image
+            resource: app-image
+      taskRef:
+        kind: Task
+        name: image-exist-check
     - name: build-and-publish-image
       resources:
         inputs:
@@ -41,6 +49,10 @@ spec:
       taskRef:
         kind: Task
         name: source-to-image
+      when:
+        - input: $(tasks.image-exist-check.results)
+          operator: in
+          values: ["false"]
     - name: update-gitops-repo
       taskRef:
         kind: Task
