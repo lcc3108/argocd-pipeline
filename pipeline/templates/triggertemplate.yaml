@@ -6,10 +6,10 @@ spec:
   params: 
   - name: git-repo-url
   - name: git-repo-name
-  - name: git-revision
   - name: git-branch
+  - name: git-sha
+  - name: git-short-sha
   - name: deploy-env
-  - name: image-tag
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineResource
@@ -20,7 +20,7 @@ spec:
       - name: url
         value: $(tt.params.git-repo-url)
       - name: revision
-        value: $(tt.params.git-revision)
+        value: $(tt.params.git-sha)
       - name: git-repo-name
         value: $(tt.params.git-repo-name)
       type: git
@@ -31,7 +31,7 @@ spec:
     spec:
       params:
       - name: url
-        value: {{ .Values.config.dockerRepo.url }}/$(tt.params.git-repo-name):$(tt.params.image-tag)
+        value: {{ tpl $.Values.dockerRepo.uri . }}/$(tt.params.git-repo-name):$(tt.params.git-short-sha)
       type: image
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -41,14 +41,14 @@ spec:
       params:
       - name: app-name
         value: $(tt.params.git-repo-name)
-      - name: git-revision
-        value: $(tt.params.git-revision)
+      - name: git-sha
+        value: $(tt.params.git-sha)
       - name: git-branch
         value: $(tt.params.git-branch)
       - name: deploy-env
         value: $(tt.params.deploy-env)
-      - name: image-tag
-        value: $(tt.params.image-tag)
+      - name: git-short-sha
+        value: $(tt.params.git-short-sha)
       pipelineRef:
         name: pipeline
       resources:
@@ -58,7 +58,7 @@ spec:
       - name: app-image
         resourceRef:
           name: image-$(tt.params.git-repo-name)-$(uid)
-      serviceAccountName: {{ .Values.config.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
 
 
 --- 
@@ -71,16 +71,16 @@ spec:
   params:
   - name: git-repo-url
     value: $(body.repository.url)
-  - name: git-revision
-    value: $(body.head_commit.id)
   - name: git-repo-name
     value: $(body.repository.name)
   - name: git-branch
     value: $(extensions.branch_name)
+  - name: git-sha
+    value: $(body.head_commit.id)
+  - name: git-short-sha
+    value: $(extensions.short_sha)
   - name: deploy-env
     value: $(extensions.deploy_env)
-  - name: image-tag
-    value: $(extensions.short_sha)
 ---
 
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -88,7 +88,7 @@ kind: EventListener
 metadata:
   name: event-listener
 spec:
-  serviceAccountName: {{ .Values.config.serviceAccount.name }}
+  serviceAccountName: {{ .Values.serviceAccount.name }}
   triggers:
   - name: master
     interceptors:

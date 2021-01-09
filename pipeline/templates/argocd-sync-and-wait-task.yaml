@@ -28,7 +28,7 @@ spec:
   stepTemplate:
     env:
       - name: ARGOCD_SERVER
-        value: {{ .Values.config.argoCD.url }}
+        value: {{ .Values.argoCD.url }}
     envFrom:
       - secretRef:
           name: argocd-env-secret # used for authentication (username/password or auth token)

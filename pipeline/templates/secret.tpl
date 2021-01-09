@@ -17,7 +17,7 @@
 # metadata:
 #   annotations:
 #     tekton.dev/git-0: https://github.com
-#   name: {{ .Values.config.serviceAccount.gitSecret }}
+#   name: {{ .Values.serviceAccount.gitSecret }}
 # type: kubernetes.io/basic-auth
 # ---
 # apiVersion: v1
@@ -28,5 +28,5 @@
 # metadata:
 #   annotations:
 #     tekton.dev/git-0: https://github.com
-#   name: {{ .Values.config.serviceAccount.dockerSecret }}
+#   name: {{ .Values.serviceAccount.dockerSecret }}
 # type: kubernetes.io/basic-auth

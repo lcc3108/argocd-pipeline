@@ -7,10 +7,10 @@ spec:
   # - name: config-repo
   params:
     - name: app-name
-    - name: git-revision
+    - name: git-sha
     - name: git-branch
+    - name: git-short-sha
     - name: deploy-env
-    - name: image-tag
   resources:
     - name: app-source
       type: git
@@ -21,8 +21,8 @@ spec:
       params:
         - name: app-name
           value: $(params.app-name)
-        - name: git-revision
-          value: $(params.git-revision)
+        - name: git-sha
+          value: $(params.git-sha)
         - name: git-branch
           value: $(params.git-branch)
         - name: deploy-env
@@ -51,15 +51,15 @@ spec:
         - name: app-name
           value: $(params.app-name)
         - name: image-tag
-          value: $(params.image-tag)
+          value: $(params.git-short-sha)
     - name: argocd-sync-deployment
       params:
         - name: app-name
-          value: {{ .Values.config.argoCD.name }}-$(params.deploy-env)
+          value: {{ .Values.argoCD.name }}-$(params.deploy-env)
         - name: flags
-          value: {{ .Values.config.argoCD.option | quote }}
+          value: {{ .Values.argoCD.option | quote }}
         - name: argocd-version
-          value: {{ .Values.config.argoCD.version }}
+          value: {{ .Values.argoCD.version }}
         - name: revision
           value: $(params.deploy-env)
       runAfter:

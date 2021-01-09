@@ -6,40 +6,32 @@ spec:
   params:
     - name: app-name
       type: string
-    - name: image-tag
+    - name: version
       type: string
-    - name: env
+    - name: deploy-env
       type: string
       default: prod
-  stepTemplate:
-    env:
-    - name: APP
-      value: $(params.app-name)
-    - name: VERSION
-      value: $(params.image-tag)
-    - name: DEPLOY_ENV
-      value: $(params.env)
   steps:
     - name: git-clone
       image: docker.io/alpine/git:v2.26.2
       script: |
-        echo "DEBUG: APP: $APP, VERSION: $VERSION, DEPLOY_ENV: $DEPLOY_ENV"
-        git config --global user.email {{ .Values.config.email }}
-        git config --global user.name {{ .Values.config.user }}
-        git clone -b master --single-branch https://github.com/{{ .Values.config.user }}/{{ .Values.config.repo }}
-        cd {{ .Values.config.repo }}
-        git branch $DEPLOY_ENV
-        git checkout $DEPLOY_ENV
+        echo "DEBUG: APP: $(params.app-name), VERSION: $(params.version), DEPLOY_ENV: $(params.deploy-env)"
+        git config --global user.email {{ .Values.email }}
+        git config --global user.name {{ .Values.user }}
+        git clone -b master --single-branch https://github.com/{{ .Values.user }}/{{ .Values.repo }}
+        cd {{ .Values.repo }}
+        git branch $(params.deploy-env)
+        git checkout $(params.deploy-env)
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       script: |
-        yq w -i {{ .Values.config.repo }}/deploy/values.yaml.$DEPLOY_ENV "apps(name==$APP).version" $VERSION
+        yq w -i {{ .Values.repo }}/deploy/values.yaml.$(params.deploy-env) "apps(name==$(params.app-name)).version" $(params.version)
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
-        cd {{ .Values.config.repo }}
+        cd {{ .Values.repo }}
         git add .
-        git commit -m "update $APP"
-        git push origin $DEPLOY_ENV --force
+        git commit -m "update $(params.app-name)"
+        git push origin $(params.deploy-env) --force
   # workspaces:
   # - name: config-repo
