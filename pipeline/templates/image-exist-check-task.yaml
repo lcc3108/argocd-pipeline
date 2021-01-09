@@ -4,7 +4,7 @@ metadata:
   name: image-exist-check
 spec:
   results:
-    - name: image-exist
+    - name: exists
       description: if image exist true else false
   resources:
     inputs:
@@ -18,5 +18,5 @@ spec:
         if ! curl --fail https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/$(resources.outputs.app-image.name)/artifacts/$(resources.outputs.app-image.tag); then
           RESULT=true
         fi
-        echo $RESULT | tee $(results.image-exist.path)
+        echo $RESULT | tee $(results.exists.path)
         

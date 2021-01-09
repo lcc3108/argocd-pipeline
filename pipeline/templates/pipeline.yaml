@@ -50,7 +50,7 @@ spec:
         kind: Task
         name: source-to-image
       when:
-        - input: $(tasks.image-exist-check.results)
+        - input: $(tasks.image-exist-check.results.exists)
           operator: in
           values: ["false"]
     - name: update-gitops-repo
