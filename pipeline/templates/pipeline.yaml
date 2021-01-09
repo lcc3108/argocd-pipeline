@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: pipeline
@@ -52,7 +52,10 @@ spec:
       when:
         - input: $(tasks.image-exist-check.results.exists)
           operator: in
-          values: ["false"]
+          values: 
+          - "false"
+      runAfter:
+        - image-exist-check
     - name: update-gitops-repo
       taskRef:
         kind: Task
