@@ -53,7 +53,7 @@ spec:
         - input: $(tasks.image-exist-check.results.exists)
           operator: in
           values: 
-          - no
+          - "no"
       runAfter:
         - image-exist-check
     - name: update-gitops-repo
