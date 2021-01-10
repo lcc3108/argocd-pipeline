@@ -30,15 +30,15 @@ spec:
       taskRef:
         kind: Task
         name: params-check
-    # - name: image-exist-check
-    #   params:
-    #     - name: image-name
-    #       value: $(params.app-name)
-    #     - name: image-tag
-    #       value: $(params.git-short-sha)
-    #   taskRef:
-    #     kind: Task
-    #     name: image-exist-check
+    - name: image-exist-check
+      params:
+        - name: image-name
+          value: $(params.app-name)
+        - name: image-tag
+          value: $(params.git-short-sha)
+      taskRef:
+        kind: Task
+        name: image-exist-check
     - name: build-and-publish-image
       params:
         - name: exists
