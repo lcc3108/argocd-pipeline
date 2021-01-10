@@ -14,6 +14,9 @@ spec:
         The build context used by Kaniko
         (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
       default: $(resources.inputs.app-source.path)
+    - name: exists
+      type: string
+      default: no
   resources:
     inputs:
       - name: app-source
@@ -28,9 +31,9 @@ spec:
       env:
         - name: "DOCKER_CONFIG"
           value: "/tekton/home/.docker/"
-      command:
-        - /kaniko/executor
-      args:
-        - --dockerfile=$(params.pathToDockerFile)
-        - --destination=$(resources.outputs.app-image.url)
-        - --context=$(params.pathToContext)
+      script: |
+        [ $(params.exists) = "no" ] &&
+        /kaniko/executor
+        --dockerfile=$(params.pathToDockerFile)
+        --destination=$(resources.outputs.app-image.url)
+        --context=$(params.pathToContext)

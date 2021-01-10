@@ -40,6 +40,9 @@ spec:
         kind: Task
         name: image-exist-check
     - name: build-and-publish-image
+      params:
+        - name: exists
+          value: $(tasks.image-exist-check.results.exists)
       resources:
         inputs:
           - name: app-source
@@ -50,11 +53,14 @@ spec:
       taskRef:
         kind: Task
         name: source-to-image
-      when:
-        - input: $(tasks.image-exist-check.results.exists)
-          operator: in
-          values: 
-          - "no"
+      ################################
+      # https://github.com/tektoncd/pipeline/issues/1023 해당 기능이 추가되면 사용가능
+      # when:
+      #   - input: $(tasks.image-exist-check.results.exists)
+      #     operator: in
+      #     values: 
+      #     - "no"
+      #################################
       runAfter:
         - image-exist-check
     - name: update-gitops-repo
