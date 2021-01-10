@@ -3,18 +3,18 @@ kind: Task
 metadata:
   name: image-exist-check
 spec:
+  params:
+    - name: image-name
+    - name: image-tag
+
   results:
     - name: exists
       description: if image exist true else false
-  resources:
-    inputs:
-      - name: app-image
-        type: image
   steps:
     - name: search-image
       image: curlimages/curl
       script: |
-        curl --fail https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/$(resources.inputs.app-image.name)/artifacts/$(resources.inputs.app-image.tag) \
+        curl --fail https://{{ .Values.dockerRepo.url }}/api/v2.0/projects/{{ .Values.dockerRepo.project }}/repositories/$(params.image-name)/artifacts/$(params.image-tag) \
         && REUSLT=yes || RESULT=no
 
         echo $RESULT | tee $(results.exists.path)
