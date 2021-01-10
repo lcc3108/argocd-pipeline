@@ -3,13 +3,13 @@ config:
   dockerRepo:
     url: harbor.lcc3108.ga/library
 apps:
-- name: node-web-app
-  version: 0.0.0
-  namespace: node-web-project
-  git:
-    url: github.com/lcc3108/node-web-app
-    private: false
-  replicaCount: 1
-  service:
-  - port: 80
-    name: http
+  - name: node-web-app
+    version: 437a0ed
+    namespace: node-web-project
+    git:
+      url: github.com/lcc3108/node-web-app
+      private: false
+    replicaCount: 1
+    service:
+      - port: 80
+        name: http
