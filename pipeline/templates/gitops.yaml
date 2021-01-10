@@ -25,7 +25,7 @@ spec:
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       script: |
-        yq w -i {{ .Values.repo }}/deploy/values.yaml "apps(name==$(params.app-name)).version" $(params.version)
+        yq w -i {{ .Values.repo }}/deploy/charts/app/values.yaml "apps(name==$(params.app-name)).version" $(params.version)
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
