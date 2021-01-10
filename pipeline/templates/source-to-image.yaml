@@ -33,8 +33,13 @@ spec:
           value: "/tekton/home/.docker/"
       script: |
         #!/busybox/sh
-        [ $(params.exists) = "no" ] &&
-        /kaniko/executor
-        --dockerfile=$(params.pathToDockerFile)
-        --destination=$(resources.outputs.app-image.url)
-        --context=$(params.pathToContext)
+
+        if [ "$(params.exists)" = "no" ]
+
+        then
+
+          /kaniko/executor --dockerfile=$(params.pathToDockerFile)
+          --destination=$(resources.outputs.app-image.url)
+          --context=$(params.pathToContext)
+
+        fi
