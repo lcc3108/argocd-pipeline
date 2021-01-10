@@ -16,7 +16,7 @@ spec:
       default: $(resources.inputs.app-source.path)
     - name: exists
       type: string
-      default: no
+      default: "no"
   resources:
     inputs:
       - name: app-source
