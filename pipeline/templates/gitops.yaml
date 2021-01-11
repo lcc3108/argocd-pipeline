@@ -16,20 +16,20 @@ spec:
       image: docker.io/alpine/git:v2.26.2
       script: |
         echo "DEBUG: APP: $(params.app-name), VERSION: $(params.version), DEPLOY_ENV: $(params.deploy-env)"
-        git config --global user.email {{ .Values.email }}
-        git config --global user.name {{ .Values.user }}
-        git clone -b master --single-branch https://github.com/{{ .Values.user }}/{{ .Values.repo }}
-        cd {{ .Values.repo }}
+        git config --global user.email {{ .Values.commitBot.email }}
+        git config --global user.name {{ .Values.commitBot.name }}
+        git clone -b master --single-branch https://github.com/{{ tpl .Values.git.repoFullName . }}
+        cd {{ .Values.git.repoName }}
         git branch $(params.deploy-env)
         git checkout $(params.deploy-env)
     - name: update-deploy-file
       image: mikefarah/yq:3.3.4
       script: |
-        yq w -i {{ .Values.repo }}/deploy/charts/app/values.yaml "apps(name==$(params.app-name)).version" $(params.version)
+        yq w -i {{ .Values.git.repoName }}/deploy/charts/app/values.yaml "apps(name==$(params.app-name)).version" $(params.version)
     - name: push-config-repo
       image: docker.io/alpine/git:v2.26.2
       script: |
-        cd {{ .Values.repo }}
+        cd {{ .Values.git.repoName }}
         git add .
         git commit -m "update $(params.app-name)"
         git push origin $(params.deploy-env) --force

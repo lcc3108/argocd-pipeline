@@ -1,16 +1,24 @@
-repo: git-ops
-email: dlacocjf32@gmail.com
-user: lcc3108
+git:
+  repoName: git-ops
+  repoOwner: lcc3108
+  repoFullName: "{{ .Values.git.repoOwner }}/{{ .Values.git.repoName }}"
+
+commitBot:
+  email: dlacocjf32@gmail.com
+  name: lcc3108
+
 argoCD:
   name: lcc3108-gitops
   version: v1.7.7
   url: argocd.lcc3108.ga
   option: "--insecure --grpc-web"
+
 dockerRepo:
   url: harbor.lcc3108.ga
   type: harbor
   project: library
   uri: "{{ .Values.dockerRepo.url }}/{{ .Values.dockerRepo.project }}"
+
 serviceAccount:
   name: builder-bot
   gitSecret: github-lcc3108
